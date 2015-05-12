@@ -81,15 +81,17 @@ solver.bc_lower[0]=pyclaw.BC.extrap
 solver.bc_upper[0]=pyclaw.BC.extrap
 
 mx = 800;
-x = pyclaw.Dimension('x',0.0,10.0,mx)
+x = pyclaw.Dimension(0.0,10.0,mx,name='x')
 domain = pyclaw.Domain([x])
 state = pyclaw.State(domain,num_eqn)
 
 state.problem_data['gamma'] = gamma
 xc = state.grid.x.centers
 
-pressure = 1. + (xc>1)*(xc<2)* 1000.  # Modify this line
+#pressure = 1. + (xc>1)*(xc<2)* 1000.  # Modify this line
 # You can change anything except the velocity in the interval (3,8)
+pressure = 1. + (xc>1)*(xc<2)* 1000. + (xc>7.0)*(xc<7.1)*925
+#pressure = 1. + (xc>1)*(xc<2)* 1000. + 1700*np.exp(-1002*(xc-7.)**2)
 
 state.q[density ,:] = 1.
 state.q[momentum,:] = 0.
@@ -102,10 +104,10 @@ solver.compute_gauge_values = gauge_pressure
 state.keep_gauges = True
 
 claw = pyclaw.Controller()
-claw.tfinal = 2.
+claw.tfinal = 5
 claw.solution = pyclaw.Solution(state,domain)
 claw.solver = solver
-claw.num_output_times = 10
+claw.num_output_times = 50
 claw.setplot = setplot
 claw.keep_copy = True
 
